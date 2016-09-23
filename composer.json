@@ -1,0 +1,10 @@
+{
+    "require": {
+        "symfony/css-selector": "^3.1",
+        "zendframework/zend-dom": "^2.6",
+        "tburry/pquery": "^1.1",
+        "querypath/QueryPath": "^3.0",
+        "masterminds/html5": "^2.2",
+        "symfony/dom-crawler": "^3.1"
+    }
+}
