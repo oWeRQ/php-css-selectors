@@ -1,11 +1,17 @@
 <?php
 
 require_once '../vendor/autoload.php';
+require_once '../vendor/cdom/CDom.php';
 require_once '../vendor/php-selector/selector.inc';
 require_once '../vendor/phpquery/phpQuery/phpQuery.php';
 require_once '../vendor/phpquery/phpQuery/phpQuery/phpQueryObject.php';
 require_once '../vendor/simplehtmldom/simple_html_dom.php';
 require_once '../vendor/parse/ParseHelper.php';
+
+class CDomSelectorPublic extends CDomSelector
+{
+	public $struct;
+}
 
 class phpQueryObjectPublic extends phpQueryObject
 {
@@ -26,6 +32,7 @@ class simple_html_dom_node_public extends simple_html_dom_node
 class ParseTest
 {
 	protected $parsers = [
+		'parseCDom',
 		'parsePhpSelector',
 		'parsePhpQuery',
 		'parsePQuery',
@@ -63,6 +70,11 @@ class ParseTest
 
 			echo "time: $time},\n";
 		}
+	}
+
+	public function parseCDom($selector)
+	{
+		new CDomSelectorPublic($selector);
 	}
 
 	public function parsePhpSelector($selector)
