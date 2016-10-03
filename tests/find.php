@@ -15,10 +15,10 @@ class FindTest
 	public $html;
 	public $expression;
 
-	public function __construct()
+	public function __construct($filename)
 	{
 		$this->parsers = preg_grep('/^run[A-Z]/', get_class_methods($this));
-		$this->html = file_get_contents('fixtures/test1.html');
+		$this->html = file_get_contents($filename);
 	}
 
 	public function css2XPath($selector)
@@ -47,7 +47,7 @@ class FindTest
 		}
 
 		foreach ($this->parsers as $parser) {
-			echo "    ".str_pad($parser.':', 16)." {";
+			echo "    ".str_pad(substr($parser, 3).':', 16)." {";
 
 			$start = microtime(true);
 
@@ -60,7 +60,7 @@ class FindTest
 				echo "error: '".$e->getMessage()."', ";
 			}
 
-			$time = round(microtime(true) - $start, 4);
+			$time = round(microtime(true) - $start, 3);
 
 			echo "count: $count, time: $time},\n";
 		}
@@ -151,6 +151,6 @@ $selectors = [
 ];
 
 foreach ($selectors as $selector) {
-	$test = new FindTest;
+	$test = new FindTest('fixtures/test1.html');
 	$test->run($selector, 1);
 }
