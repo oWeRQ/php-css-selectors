@@ -1,11 +1,10 @@
 <?php
 
 require_once '../vendor/autoload.php';
-//require_once '../vendor/cdom/CDom.php';
+require_once '../vendor/cdom/CDom.php';
 //require_once '../vendor/php-selector/selector.inc';
-//require_once '../vendor/phpquery/phpQuery/phpQuery.php';
-//require_once '../vendor/phpquery/phpQuery/phpQuery/phpQueryObject.php';
-//require_once '../vendor/simplehtmldom/simple_html_dom.php';
+require_once '../vendor/phpquery/phpQuery/phpQuery.php';
+require_once '../vendor/simplehtmldom/simple_html_dom.php';
 require_once '../vendor/parse/XPathQuery.php';
 require_once '../vendor/parse/ParseQuery.php';
 
@@ -132,6 +131,61 @@ class FindTest
 	public function runZendQuery($selector)
 	{
 		return count($this->zendDom->execute($selector));
+	}
+
+	public function before_runSimpleHtmlDom($selector)
+	{
+		$this->simpleHtmlDom = str_get_html($this->html);
+	}
+
+	public function runSimpleHtmlDom($selector)
+	{
+		return count($this->simpleHtmlDom->find($selector));
+	}
+
+	public function before_runQueryPath($selector)
+	{
+		$this->queryPath = qp($this->html);
+	}
+
+	public function runQueryPath($selector)
+	{
+		return $this->queryPath->find($selector)->length;
+	}
+
+	/*
+	public function before_runPQuery($selector)
+	{
+		unset($this->pQuery);
+		$this->pQuery = \pQuery::parseStr($this->html);
+	}
+
+	public function runPQuery($selector)
+	{
+		return $this->pQuery->query($selector)->count();
+	}
+	*/
+
+	/*
+	public function before_runCDom($selector)
+	{
+		$this->cDom = \CDom::fromString($this->html);
+	}
+
+	public function runCDom($selector)
+	{
+		return $this->cDom->find($selector)->length();
+	}
+	*/
+
+	public function before_runPhpQuery($selector)
+	{
+		$this->phpQuery = \phpQuery::newDocument($this->html);
+	}
+
+	public function runPhpQuery($selector)
+	{
+		return $this->phpQuery[$selector]->size();
 	}
 }
 
