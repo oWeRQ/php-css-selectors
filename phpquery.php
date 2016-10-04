@@ -5,14 +5,19 @@
 require_once('vendor/phpquery/phpQuery/phpQuery.php');
 require_once('vendor/phpquery/phpQuery/phpQuery/phpQueryObject.php');
 
+//phpQuery::$debug = true;
+
 class phpQueryObjectPublic extends phpQueryObject
 {
-	public function __construct() {}
+	public $XQuery = [];
 
-	public function parseSelector($query) {
-		return parent::parseSelector($query);
+	public function runQuery($XQuery, $selector = null, $compare = null) {
+		$this->XQuery[] = $XQuery;
+		return parent::runQuery($XQuery, $selector, $compare);
 	}
 }
 
-$pqo = new phpQueryObjectPublic;
-var_dump($pqo->parseSelector('div.item > h4 > a'));
+$documentID = phpQuery::newDocument('<div class="item"><h4><a href="#"></a></h4></div>')->getDocumentID();
+$pqo = new phpQueryObjectPublic($documentID);
+$pqo->find('div.item > h4 > a');
+var_dump($pqo->XQuery);
