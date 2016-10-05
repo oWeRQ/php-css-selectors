@@ -1,6 +1,7 @@
 <?php
 
 require_once '../vendor/autoload.php';
+require_once '../vendor/powertools/dom-query/vendor/Loader.php';
 require_once '../vendor/cdom/CDom.php';
 //require_once '../vendor/php-selector/selector.inc';
 require_once '../vendor/phpquery/phpQuery/phpQuery.php';
@@ -43,15 +44,6 @@ class FindTest
 		$this->expression = $this->css2XPath($selector);
 
 		echo "{\n  selector: '{$selector}',\n  expression: '{$this->expression}',\n  parsers: {\n";
-
-		foreach ($this->parsers as $parser) {
-			$before = 'before_'.$parser;
-
-			if (method_exists($this, $before))
-				$this->$before($selector);
-
-			//$this->$parser('div');
-		}
 
 		foreach ($this->parsers as $parser) {
 			echo "    ".str_pad(substr($parser, 3).':', 16)." {";
@@ -169,12 +161,31 @@ class FindTest
 		return count($this->zendDom->execute($selector));
 	}
 
+	public function before_runFluentDOM($selector)
+	{
+		$this->FluentDOM = FluentDOM::Query($this->html);
+	}
+	public function runFluentDOM($selector)
+	{
+		return $this->FluentDOM->find($this->expression)->length;
+	}
+
+	public function before_runFluentDOMCSS($selector)
+	{
+		$this->FluentDOMCSS = FluentDOM::QueryCss($this->html);
+	}
+
+	public function runFluentDOMCSS($selector)
+	{
+		return $this->FluentDOMCSS->find($selector)->length;
+	}
+
 	public function before_runPhpQuery($selector)
 	{
 		$this->phpQuery = \phpQuery::newDocument($this->html);
 	}
 
-	public function runPhpQuery($selector)
+	public function _runPhpQuery($selector)
 	{
 		return $this->phpQuery[$selector]->size();
 	}
@@ -184,7 +195,7 @@ class FindTest
 		$this->queryPath = qp($this->html);
 	}
 
-	public function runQueryPath($selector)
+	public function _runQueryPath($selector)
 	{
 		return $this->queryPath->find($selector)->length;
 	}
@@ -194,7 +205,7 @@ class FindTest
 		$this->simpleHtmlDom = str_get_html($this->html);
 	}
 
-	public function runSimpleHtmlDom($selector)
+	public function _runSimpleHtmlDom($selector)
 	{
 		return count($this->simpleHtmlDom->find($selector));
 	}
@@ -204,7 +215,7 @@ class FindTest
 		$this->cDom = \CDom::fromString($this->html);
 	}
 
-	public function runCDom($selector)
+	public function _runCDom($selector)
 	{
 		return $this->cDom->find($selector)->length;
 	}
@@ -214,10 +225,24 @@ class FindTest
 		$this->pQuery = \pQuery::parseStr($this->html);
 	}
 
-	public function runPQuery($selector)
+	public function _runPQuery($selector)
 	{
 		return $this->pQuery->query($selector)->count();
 	}
+
+	/*
+	public function before_runDomQuery($selector)
+	{
+		$this->domQuery = \PowerTools\DOM_Query::loadHTML($this->html);
+	}
+
+	public function runDomQuery($selector)
+	{
+		return count($this->domQuery->select($selector)->nodes);
+	}
+	*/
+
+	
 }
 
 $selectors = [
@@ -232,9 +257,9 @@ $selectors = [
 	'ul > li.item100',
 	'ul .item100',
 	'ul li.item100',
-	//'ul > *',
-	//'ul *',
-	//'*',
+	'ul > *',
+	'ul *',
+	'*',
 ];
 
 foreach ($selectors as $selector) {

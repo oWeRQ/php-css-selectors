@@ -42,6 +42,7 @@ class ParseTest
 		'converterZend',
 		'converterParseHelper',
 		'converterParseHelperPlain',
+		'converterPhpCss',
 	];
 
 	public function run($selector, $interations = 1000)
@@ -145,6 +146,11 @@ class ParseTest
 	public function converterParseHelperPlain($selector)
 	{
 		\ParseHelper::css2XPathPlain($selector);
+	}
+
+	public function converterPhpCss($selector)
+	{
+		\PhpCss::toXpath($selector);
 	}
 }
 
