@@ -203,7 +203,6 @@ class FindTest
 		return count($result);
 	}
 
-	/*
 	public function before_runCDom($selector)
 	{
 		$this->cDom = \CDom::fromString($this->html);
@@ -211,9 +210,12 @@ class FindTest
 
 	public function runCDom($selector)
 	{
-		return $this->cDom->find($selector)->length();
+		$result = [];
+		foreach ($this->cDom->find($selector) as $node) {
+			$result[] = trim($node->text());
+		}
+		return count($result);
 	}
-	*/
 
 	public function before_runPhpQuery($selector)
 	{

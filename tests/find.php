@@ -14,6 +14,14 @@ class FindTest
 	public $html;
 	public $expression;
 
+	public static $total = [];
+
+	public static function top()
+	{
+		asort(self::$total);
+		return self::$total;
+	}
+
 	public function __construct($filename)
 	{
 		$this->parsers = preg_grep('/^run[A-Z]/', get_class_methods($this));
@@ -38,7 +46,7 @@ class FindTest
 
 		foreach ($this->parsers as $parser) {
 			$before = 'before_'.$parser;
-			
+
 			if (method_exists($this, $before))
 				$this->$before($selector);
 
@@ -48,6 +56,14 @@ class FindTest
 		foreach ($this->parsers as $parser) {
 			echo "    ".str_pad(substr($parser, 3).':', 16)." {";
 
+			$start = microtime(true);
+
+			$before = 'before_'.$parser;
+			
+			if (method_exists($this, $before))
+				$this->$before($selector);
+
+			$load = round(microtime(true) - $start, 3);
 			$start = microtime(true);
 
 			try {
@@ -61,7 +77,12 @@ class FindTest
 
 			$time = round(microtime(true) - $start, 3);
 
-			echo "count: $count, time: $time},\n";
+			echo "count: $count, time: $time, load: $load},\n";
+
+			if (empty(self::$total[$parser]))
+				self::$total[$parser] = 0;
+
+			self::$total[$parser] += $time + $load;
 		}
 
 		echo "  }\n},\n";
@@ -110,17 +131,32 @@ class FindTest
 
 	public function before_runDomCrawlerXP($selector)
 	{
-		$this->domCrawler = new \Symfony\Component\DomCrawler\Crawler($this->html);
+		$this->domCrawlerXP = new \Symfony\Component\DomCrawler\Crawler($this->html);
 	}
 
 	public function runDomCrawlerXP($selector)
 	{
-		return $this->domCrawler->filterXPath($this->expression)->count();
+		return $this->domCrawlerXP->filterXPath($this->expression)->count();
+	}
+
+	public function before_runDomCrawler($selector)
+	{
+		$this->domCrawler = new \Symfony\Component\DomCrawler\Crawler($this->html);
 	}
 
 	public function runDomCrawler($selector)
 	{
 		return $this->domCrawler->filter($selector)->count();
+	}
+
+	public function before_runZendQueryXP($selector)
+	{
+		$this->zendDomXP = new \Zend\Dom\Query($this->html);
+	}
+
+	public function runZendQueryXP($selector)
+	{
+		return count($this->zendDomXP->queryXpath($this->expression, $selector));
 	}
 
 	public function before_runZendQuery($selector)
@@ -133,14 +169,14 @@ class FindTest
 		return count($this->zendDom->execute($selector));
 	}
 
-	public function before_runSimpleHtmlDom($selector)
+	public function before_runPhpQuery($selector)
 	{
-		$this->simpleHtmlDom = str_get_html($this->html);
+		$this->phpQuery = \phpQuery::newDocument($this->html);
 	}
 
-	public function runSimpleHtmlDom($selector)
+	public function runPhpQuery($selector)
 	{
-		return count($this->simpleHtmlDom->find($selector));
+		return $this->phpQuery[$selector]->size();
 	}
 
 	public function before_runQueryPath($selector)
@@ -153,20 +189,16 @@ class FindTest
 		return $this->queryPath->find($selector)->length;
 	}
 
-	/*
-	public function before_runPQuery($selector)
+	public function before_runSimpleHtmlDom($selector)
 	{
-		unset($this->pQuery);
-		$this->pQuery = \pQuery::parseStr($this->html);
+		$this->simpleHtmlDom = str_get_html($this->html);
 	}
 
-	public function runPQuery($selector)
+	public function runSimpleHtmlDom($selector)
 	{
-		return $this->pQuery->query($selector)->count();
+		return count($this->simpleHtmlDom->find($selector));
 	}
-	*/
 
-	/*
 	public function before_runCDom($selector)
 	{
 		$this->cDom = \CDom::fromString($this->html);
@@ -174,18 +206,17 @@ class FindTest
 
 	public function runCDom($selector)
 	{
-		return $this->cDom->find($selector)->length();
-	}
-	*/
-
-	public function before_runPhpQuery($selector)
-	{
-		$this->phpQuery = \phpQuery::newDocument($this->html);
+		return $this->cDom->find($selector)->length;
 	}
 
-	public function runPhpQuery($selector)
+	public function before_runPQuery($selector)
 	{
-		return $this->phpQuery[$selector]->size();
+		$this->pQuery = \pQuery::parseStr($this->html);
+	}
+
+	public function runPQuery($selector)
+	{
+		return $this->pQuery->query($selector)->count();
 	}
 }
 
@@ -201,10 +232,14 @@ $selectors = [
 	'ul > li.item100',
 	'ul .item100',
 	'ul li.item100',
-	'*',
+	//'ul > *',
+	//'ul *',
+	//'*',
 ];
 
 foreach ($selectors as $selector) {
 	$test = new FindTest('fixtures/test1.html');
 	$test->run($selector, 1);
 }
+
+print_r(FindTest::top());
