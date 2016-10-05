@@ -32,22 +32,33 @@ class simple_html_dom_node_public extends simple_html_dom_node
 class ParseTest
 {
 	protected $parsers = [
-		'parseCDom',
-		'parsePhpSelector',
-		'parsePhpQuery',
-		'parsePQuery',
-		'parseQueryPath',
-		'parseSimpleHtmlDom',
-		'converterSymfony',
-		'converterZend',
-		'converterParseHelper',
-		'converterParseHelperPlain',
-		'converterPhpCss',
+		'runCDom',
+		'runPhpSelector',
+		'runPhpQuery',
+		'runPQuery',
+		'runQueryPath',
+		'runSimpleHtmlDom',
+		'runSymfony',
+		'runZend',
+		'runParseHelper',
+		'runParseHelperPlain',
+		'runPhpCss',
 	];
+
+	public static $total = [];
+
+	public static function top()
+	{
+		asort(self::$total);
+		return self::$total;
+	}
 
 	public function run($selector, $interations = 1000)
 	{
-		shuffle($this->parsers);
+		//shuffle($this->parsers);
+		sort($this->parsers);
+
+		echo "{\n  selector: '$selector',\n  parsers: {\n";
 
 		foreach ($this->parsers as $parser) {
 			$before = 'before_'.$parser;
@@ -59,7 +70,7 @@ class ParseTest
 		}
 
 		foreach ($this->parsers as $parser) {
-			echo "{selector: '$selector', parser: '$parser', ";
+			echo "    ".str_pad(substr($parser, 3).':', 18)." {";
 
 			$start = microtime(true);
 
@@ -70,26 +81,33 @@ class ParseTest
 			$time = round(microtime(true) - $start, 4);
 
 			echo "time: $time},\n";
+
+			if (empty(self::$total[$parser]))
+				self::$total[$parser] = 0;
+
+			self::$total[$parser] += $time;
 		}
+
+		echo "  }\n},\n";
 	}
 
-	public function parseCDom($selector)
+	public function runCDom($selector)
 	{
 		new CDomSelectorPublic($selector);
 	}
 
-	public function parsePhpSelector($selector)
+	public function runPhpSelector($selector)
 	{
 		selector_to_xpath($selector);
 	}
 
-	public function parsePhpQuery($selector)
+	public function runPhpQuery($selector)
 	{
 		$phpQuery = new \phpQueryObjectPublic;
 		$phpQuery->parseSelector($selector);
 	}
 
-	public function parsePQuery($selector)
+	public function runPQuery($selector)
 	{
 		$parser = new \pQuery\CSSQueryTokenizer;
 		$parser->setDoc($selector);
@@ -110,45 +128,45 @@ class ParseTest
 		} while ($token = $parser->next());
 	}
 
-	public function parseQueryPath($selector)
+	public function runQueryPath($selector)
 	{
 		$handler = new \QueryPath\CSS\Selector;
 		$parser = new \QueryPath\CSS\Parser($selector, $handler);
 		$parser->parse();
 	}
 
-	public function parseSimpleHtmlDom($selector)
+	public function runSimpleHtmlDom($selector)
 	{
 		$node = new \simple_html_dom_node_public(new \simple_html_dom);
 		$node->parse_selector($selector);
 	}
 
-	public function before_converterSymfony()
+	public function before_runSymfony()
 	{
 		$this->converter = new \Symfony\Component\CssSelector\CssSelectorConverter;
 	}
 
-	public function converterSymfony($selector)
+	public function runSymfony($selector)
 	{
 		$this->converter->toXPath($selector);
 	}
 
-	public function converterZend($selector)
+	public function runZend($selector)
 	{
 		\Zend\Dom\Document\Query::cssToXpath($selector);
 	}
 
-	public function converterParseHelper($selector)
+	public function runParseHelper($selector)
 	{
 		\ParseHelper::css2XPath($selector);
 	}
 
-	public function converterParseHelperPlain($selector)
+	public function runParseHelperPlain($selector)
 	{
 		\ParseHelper::css2XPathPlain($selector);
 	}
 
-	public function converterPhpCss($selector)
+	public function runPhpCss($selector)
 	{
 		\PhpCss::toXpath($selector);
 	}
@@ -164,3 +182,5 @@ foreach ($selectors as $selector) {
 	$test = new ParseTest;
 	$test->run($selector, 10000);
 }
+
+print_r(ParseTest::top());
