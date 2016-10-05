@@ -31,6 +31,8 @@ class FindTest
 
 	public function css2XPath($selector)
 	{
+		//return \PhpCss::toXpath($selector);
+		
 		return \ParseHelper::css2XPath($selector);
 
 		$converter = new \Symfony\Component\CssSelector\CssSelectorConverter;
@@ -242,7 +244,15 @@ class FindTest
 	}
 	*/
 
-	
+	public function before_runXParser($selector)
+	{
+		$this->XParser = new \gymadarasz\xparser\XNode($this->html);
+	}
+
+	public function _runXParser($selector)
+	{
+		return count($this->XParser->__invoke($selector)->getElements());
+	}
 }
 
 $selectors = [

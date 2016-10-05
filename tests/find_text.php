@@ -13,6 +13,14 @@ class FindTest
 	public $html;
 	public $expression;
 
+	public static $total = [];
+
+	public static function top()
+	{
+		asort(self::$total);
+		return self::$total;
+	}
+
 	public function __construct($filename)
 	{
 		$this->parsers = preg_grep('/^run[A-Z]/', get_class_methods($this));
@@ -21,6 +29,8 @@ class FindTest
 
 	public function css2XPath($selector)
 	{
+		//return \PhpCss::toXpath($selector);
+
 		return \ParseHelper::css2XPath($selector);
 
 		$converter = new \Symfony\Component\CssSelector\CssSelectorConverter;
@@ -61,6 +71,11 @@ class FindTest
 			$time = round(microtime(true) - $start, 3);
 
 			echo "count: $count, time: $time},\n";
+
+			if (empty(self::$total[$parser]))
+				self::$total[$parser] = 0;
+
+			self::$total[$parser] += $time;
 		}
 
 		echo "  }\n},\n";
@@ -160,16 +175,43 @@ class FindTest
 		return count($result);
 	}
 
-	public function before_runSimpleHtmlDom($selector)
+	public function before_runFluentDOM($selector)
 	{
-		$this->simpleHtmlDom = str_get_html($this->html);
+		$this->FluentDOM = FluentDOM::Query($this->html);
 	}
-
-	public function runSimpleHtmlDom($selector)
+	public function runFluentDOM($selector)
 	{
 		$result = [];
-		foreach ($this->simpleHtmlDom->find($selector) as $node) {
-			$result[] = trim($node->text());
+		foreach ($this->FluentDOM->find($this->expression) as $node) {
+			$result[] = trim($node->textContent);
+		}
+		return count($result);
+	}
+
+	public function before_runFluentDOMCSS($selector)
+	{
+		$this->FluentDOMCSS = FluentDOM::QueryCss($this->html);
+	}
+
+	public function runFluentDOMCSS($selector)
+	{
+		$result = [];
+		foreach ($this->FluentDOMCSS->find($selector) as $node) {
+			$result[] = trim($node->textContent);
+		}
+		return count($result);
+	}
+
+	public function before_runPhpQuery($selector)
+	{
+		$this->phpQuery = \phpQuery::newDocument($this->html);
+	}
+
+	public function runPhpQuery($selector)
+	{
+		$result = [];
+		foreach ($this->phpQuery[$selector] as $node) {
+			$result[] = trim(pq($node)->text());
 		}
 		return count($result);
 	}
@@ -188,16 +230,15 @@ class FindTest
 		return count($result);
 	}
 
-	public function before_runPQuery($selector)
+	public function before_runSimpleHtmlDom($selector)
 	{
-		unset($this->pQuery);
-		$this->pQuery = \pQuery::parseStr($this->html);
+		$this->simpleHtmlDom = str_get_html($this->html);
 	}
 
-	public function runPQuery($selector)
+	public function runSimpleHtmlDom($selector)
 	{
 		$result = [];
-		foreach ($this->pQuery->query($selector) as $node) {
+		foreach ($this->simpleHtmlDom->find($selector) as $node) {
 			$result[] = trim($node->text());
 		}
 		return count($result);
@@ -217,16 +258,17 @@ class FindTest
 		return count($result);
 	}
 
-	public function before_runPhpQuery($selector)
+	public function before_runPQuery($selector)
 	{
-		$this->phpQuery = \phpQuery::newDocument($this->html);
+		unset($this->pQuery);
+		$this->pQuery = \pQuery::parseStr($this->html);
 	}
 
-	public function runPhpQuery($selector)
+	public function runPQuery($selector)
 	{
 		$result = [];
-		foreach ($this->phpQuery[$selector] as $node) {
-			$result[] = trim(pq($node)->text());
+		foreach ($this->pQuery->query($selector) as $node) {
+			$result[] = trim($node->text());
 		}
 		return count($result);
 	}
@@ -245,3 +287,5 @@ foreach ($selectors as $selector) {
 	$test = new FindTest('fixtures/test2.html');
 	$test->run($selector, 10);
 }
+
+print_r(FindTest::top());
