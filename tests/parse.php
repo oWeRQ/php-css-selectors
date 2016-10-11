@@ -6,7 +6,7 @@ require_once '../vendor/php-selector/selector.inc';
 require_once '../vendor/phpquery/phpQuery/phpQuery.php';
 require_once '../vendor/phpquery/phpQuery/phpQuery/phpQueryObject.php';
 require_once '../vendor/simplehtmldom/simple_html_dom.php';
-require_once '../vendor/parse/ParseHelper.php';
+require_once '../vendor/parse/XPathHelper.php';
 
 class CDomSelectorPublic extends CDomSelector
 {
@@ -40,8 +40,8 @@ class ParseTest
 		'runSimpleHtmlDom',
 		'runSymfony',
 		'runZend',
-		'runParseHelper',
-		'runParseHelperPlain',
+		'runXPathHelper',
+		'runXPathHelperPlain',
 		'runPhpCss',
 	];
 
@@ -156,14 +156,14 @@ class ParseTest
 		\Zend\Dom\Document\Query::cssToXpath($selector);
 	}
 
-	public function runParseHelper($selector)
+	public function runXPathHelper($selector)
 	{
-		\ParseHelper::css2XPath($selector);
+		\XPathHelper::toXPath($selector);
 	}
 
-	public function runParseHelperPlain($selector)
+	public function runXPathHelperPlain($selector)
 	{
-		\ParseHelper::css2XPathPlain($selector);
+		\XPathHelper::toXPathPlain($selector);
 	}
 
 	public function runPhpCss($selector)

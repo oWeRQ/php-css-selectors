@@ -4,6 +4,8 @@ require_once '../vendor/autoload.php';
 require_once '../vendor/cdom/CDom.php';
 require_once '../vendor/phpquery/phpQuery/phpQuery.php';
 require_once '../vendor/simplehtmldom/simple_html_dom.php';
+require_once '../vendor/parse/DOMHelper.php';
+require_once '../vendor/parse/XPathHelper.php';
 require_once '../vendor/parse/XPathQuery.php';
 require_once '../vendor/parse/ParseQuery.php';
 
@@ -27,11 +29,13 @@ class FindTest
 		$this->html = file_get_contents($filename);
 	}
 
-	public function css2XPath($selector)
+	public function toXPath($selector)
 	{
-		//return \PhpCss::toXpath($selector);
+		return \XPathHelper::toXPath($selector);
 
-		return \ParseHelper::css2XPath($selector);
+		return \PhpCss::toXpath($selector);
+
+		return \PhpCss::toXpath($selector, \PhpCss\Ast\Visitor\Xpath::OPTION_EXPLICIT_NAMESPACES);
 
 		$converter = new \Symfony\Component\CssSelector\CssSelectorConverter;
 		return $converter->toXPath($selector);
@@ -41,7 +45,7 @@ class FindTest
 	{
 		//shuffle($this->parsers);
 
-		$this->expression = $this->css2XPath($selector);
+		$this->expression = $this->toXPath($selector);
 
 		echo "{\n  selector: '{$selector}',\n  expression: '{$this->expression}',\n  parsers: {\n";
 
@@ -83,7 +87,7 @@ class FindTest
 
 	public function before_runXPath($selector)
 	{
-		$this->xpath = \ParseHelper::htmlXPath($this->html, false);
+		$this->xpath = \DOMHelper::htmlXPath($this->html, false);
 	}
 
 	public function runXPath($selector)
@@ -97,7 +101,7 @@ class FindTest
 
 	public function before_runXPathExt($selector)
 	{
-		$this->xpathExt = \ParseHelper::htmlXPath($this->html);
+		$this->xpathExt = \DOMHelper::htmlXPath($this->html);
 	}
 
 	public function runXPathExt($selector)
@@ -111,15 +115,15 @@ class FindTest
 
 	public function before_runXPathQuery()
 	{
-		$xpath = \ParseHelper::htmlXPath($this->html, false);
+		$xpath = \DOMHelper::htmlXPath($this->html, false);
 		$this->xpathQuery = new \XPathQuery($xpath->document, $xpath);
 	}
 
 	public function runXPathQuery($selector)
 	{
 		$result = [];
-		foreach ($this->xpathQuery->xpathQuery($this->expression) as $node) {
-			$result[] = trim($node->get(0)->textContent);
+		foreach ($this->xpathQuery->xpath($this->expression) as $node) {
+			$result[] = trim($node->textContent);
 		}
 		return count($result);
 	}
@@ -190,7 +194,7 @@ class FindTest
 
 	public function before_runFluentDOMCSS($selector)
 	{
-		$this->FluentDOMCSS = FluentDOM::QueryCss($this->html);
+		$this->FluentDOMCSS = FluentDOM::QueryCss($this->html, 'text/html');
 	}
 
 	public function runFluentDOMCSS($selector)

@@ -3,11 +3,17 @@
 require_once '../vendor/autoload.php';
 require_once '../vendor/powertools/dom-query/vendor/Loader.php';
 require_once '../vendor/cdom/CDom.php';
-//require_once '../vendor/php-selector/selector.inc';
 require_once '../vendor/phpquery/phpQuery/phpQuery.php';
 require_once '../vendor/simplehtmldom/simple_html_dom.php';
+require_once '../vendor/parse/DOMHelper.php';
+require_once '../vendor/parse/XPathHelper.php';
 require_once '../vendor/parse/XPathQuery.php';
 require_once '../vendor/parse/ParseQuery.php';
+
+function time_format($seconds)
+{
+	return str_replace('0', 'o', number_format($seconds, 3));
+}
 
 class FindTest
 {
@@ -29,11 +35,13 @@ class FindTest
 		$this->html = file_get_contents($filename);
 	}
 
-	public function css2XPath($selector)
+	public function toXPath($selector)
 	{
-		//return \PhpCss::toXpath($selector);
-		
-		return \ParseHelper::css2XPath($selector);
+		return \XPathHelper::toXPath($selector);
+
+		return \PhpCss::toXpath($selector);
+
+		return \PhpCss::toXpath($selector, \PhpCss\Ast\Visitor\Xpath::OPTION_EXPLICIT_NAMESPACES);
 
 		$converter = new \Symfony\Component\CssSelector\CssSelectorConverter;
 		return $converter->toXPath($selector);
@@ -43,21 +51,20 @@ class FindTest
 	{
 		//shuffle($this->parsers);
 
-		$this->expression = $this->css2XPath($selector);
+		$this->expression = $this->toXPath($selector);
 
 		echo "{\n  selector: '{$selector}',\n  expression: '{$this->expression}',\n  parsers: {\n";
 
 		foreach ($this->parsers as $parser) {
 			echo "    ".str_pad(substr($parser, 3).':', 16)." {";
 
-			$start = microtime(true);
+			$load = microtime(true);
 
 			$before = 'before_'.$parser;
 			
 			if (method_exists($this, $before))
 				$this->$before($selector);
 
-			$load = round(microtime(true) - $start, 3);
 			$start = microtime(true);
 
 			try {
@@ -69,22 +76,35 @@ class FindTest
 				echo "error: '".$e->getMessage()."', ";
 			}
 
-			$time = round(microtime(true) - $start, 3);
+			$end = microtime(true);
 
-			echo "count: $count, time: $time, load: $load},\n";
+			echo "count: $count, ";
+			echo "time: ".time_format($end - $start).", ";
+			echo "load: ".time_format($start - $load);
+			echo "},\n";
 
 			if (empty(self::$total[$parser]))
 				self::$total[$parser] = 0;
 
-			self::$total[$parser] += $time + $load;
+			self::$total[$parser] += $end - $load;
 		}
 
 		echo "  }\n},\n";
 	}
 
+	public function before_runSimpleXML($selector)
+	{
+		$this->SimpleXML = new SimpleXMLElement($this->html);
+	}
+
+	public function runSimpleXML($selector)
+	{
+		return count($this->SimpleXML->xpath($this->expression));
+	}
+
 	public function before_runXPath($selector)
 	{
-		$this->xpath = \ParseHelper::htmlXPath($this->html, false);
+		$this->xpath = \DOMHelper::htmlXPath($this->html, false);
 	}
 
 	public function runXPath($selector)
@@ -94,7 +114,7 @@ class FindTest
 
 	public function before_runXPathExt($selector)
 	{
-		$this->xpathExt = \ParseHelper::htmlXPath($this->html);
+		$this->xpathExt = \DOMHelper::htmlXPath($this->html);
 	}
 
 	public function runXPathExt($selector)
@@ -104,13 +124,13 @@ class FindTest
 
 	public function before_runXPathQuery()
 	{
-		$xpath = \ParseHelper::htmlXPath($this->html, false);
+		$xpath = \DOMHelper::htmlXPath($this->html);
 		$this->xpathQuery = new \XPathQuery($xpath->document, $xpath);
 	}
 
 	public function runXPathQuery($selector)
 	{
-		return $this->xpathQuery->xpathQuery($this->expression)->length();
+		return $this->xpathQuery->xpath($this->expression)->length();
 	}
 
 	public function before_runParseQuery()
@@ -172,14 +192,24 @@ class FindTest
 		return $this->FluentDOM->find($this->expression)->length;
 	}
 
-	public function before_runFluentDOMCSS($selector)
+	public function before_runFluentDOMCSS1($selector)
 	{
-		$this->FluentDOMCSS = FluentDOM::QueryCss($this->html);
+		$this->FluentDOMCSS1 = FluentDOM::QueryCss($this->html, 'text/xml');
 	}
 
-	public function runFluentDOMCSS($selector)
+	public function runFluentDOMCSS1($selector)
 	{
-		return $this->FluentDOMCSS->find($selector)->length;
+		return $this->FluentDOMCSS1->find($selector)->length;
+	}
+
+	public function before_runFluentDOMCSS2($selector)
+	{
+		$this->FluentDOMCSS2 = FluentDOM::QueryCss($this->html, 'text/html');
+	}
+
+	public function runFluentDOMCSS2($selector)
+	{
+		return $this->FluentDOMCSS2->find($selector)->length;
 	}
 
 	public function before_runPhpQuery($selector)
