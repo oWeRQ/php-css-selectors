@@ -1,26 +1,18 @@
 <?php
 
 require_once '../vendor/autoload.php';
-require_once 'FindCount.php';
+require_once 'FindText.php';
 
 $jsonOptions = JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT;
 
-$interations = 1;
+$interations = 10;
 
 $selectors = [
-	'ul',
-	'.item100',
-	'li.item100',
-	'#list100 > li',
-	'ul#list100 > li',
-	'#list100 li',
-	'ul#list100 li',
-	'ul > .item100',
-	'ul > li.item100',
-	'ul .item100',
-	'ul li.item100',
-	'ul > *',
-	'ul *',
+	'table',
+	'th',
+	'td',
+	'table > tbody > tr > td',
+	'table tbody tr td',
 	'*',
 ];
 
@@ -42,10 +34,10 @@ $translators = [
 
 foreach ($translators as $desc => $translator) {
 	foreach ($selectors as $selector) {
-		$test = new FindCount('fixtures/test1.html');
+		$test = new FindText('fixtures/test2.html');
 		$test->run($selector, $translator($selector), $interations, $desc);
 	}
 
-	echo json_encode(FindCount::top(), $jsonOptions).",\n";
-	FindCount::$total = [];
+	echo json_encode(FindText::top(), $jsonOptions)."\n";
+	FindText::$total = [];
 }
