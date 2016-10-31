@@ -139,9 +139,9 @@ class FindCount extends FindAbstract
 	/**
 	 * FluentDOMExpr
 	 */
-	public function before_runFluentDOMExpr($selector)
+	public function before_runFluentDOMExpr($html)
 	{
-		return \FluentDOM::Query($this->html);
+		return \FluentDOM::Query($html);
 	}
 
 	public function runFluentDOMExpr(\FluentDOM\Query $fluentDOM, $selector, $expression)
@@ -152,9 +152,9 @@ class FindCount extends FindAbstract
 	/**
 	 * FluentDOMCssXml
 	 */
-	public function before_runFluentDOMCssXml($selector)
+	public function before_runFluentDOMCssXml($html)
 	{
-		return \FluentDOM::QueryCss($this->html, 'text/xml');
+		return \FluentDOM::QueryCss($html, 'text/xml');
 	}
 
 	public function runFluentDOMCssXml(\FluentDOM\Query $fluentDOM, $selector, $expression)
@@ -165,9 +165,9 @@ class FindCount extends FindAbstract
 	/**
 	 * FluentDOMCssHtml
 	 */
-	public function before_runFluentDOMCssHtml($selector)
+	public function before_runFluentDOMCssHtml($html)
 	{
-		return \FluentDOM::QueryCss($this->html, 'text/html');
+		return \FluentDOM::QueryCss($html, 'text/html');
 	}
 
 	public function runFluentDOMCssHtml(\FluentDOM\Query $fluentDOM, $selector, $expression)

@@ -3,8 +3,6 @@
 require_once '../vendor/autoload.php';
 require_once 'FindText.php';
 
-$jsonOptions = JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT;
-
 $interations = 10;
 
 $selectors = [
@@ -34,10 +32,10 @@ $translators = [
 
 foreach ($translators as $desc => $translator) {
 	foreach ($selectors as $selector) {
-		$test = new FindText('fixtures/test2.html');
+		$test = new FindText(file_get_contents('fixtures/test2.html'));
 		$test->run($selector, $translator($selector), $interations, $desc);
 	}
 
-	echo json_encode(FindText::top(), $jsonOptions)."\n";
-	FindText::$total = [];
+	echo FindText::top().",\n";
+	FindText::resetTop();
 }

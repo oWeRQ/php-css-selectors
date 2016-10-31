@@ -3,8 +3,6 @@
 require_once '../vendor/autoload.php';
 require_once 'FindCount.php';
 
-$jsonOptions = JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT;
-
 $interations = 1;
 
 $selectors = [
@@ -42,10 +40,10 @@ $translators = [
 
 foreach ($translators as $desc => $translator) {
 	foreach ($selectors as $selector) {
-		$test = new FindCount('fixtures/test1.html');
+		$test = new FindCount(file_get_contents('fixtures/test1.html'));
 		$test->run($selector, $translator($selector), $interations, $desc);
 	}
 
-	echo json_encode(FindCount::top(), $jsonOptions).",\n";
-	FindCount::$total = [];
+	echo FindCount::top().",\n";
+	FindCount::resetTop();
 }

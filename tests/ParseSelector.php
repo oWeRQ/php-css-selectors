@@ -1,6 +1,7 @@
 <?php
 
 require_once '../vendor/autoload.php';
+require_once 'FindAbstract.php';
 
 class CDomSelectorPublic extends CDomSelector
 {
@@ -23,64 +24,18 @@ class simple_html_dom_node_public extends simple_html_dom_node
 	}
 }
 
-class ParseTest
+class ParseSelector extends FindAbstract
 {
-	public static $total = [];
-
-	public static function top()
-	{
-		asort(self::$total);
-		return self::$total;
-	}
-
-	public function __construct()
-	{
-		$this->parsers = preg_grep('/^run[A-Z]/', get_class_methods($this));
-		
-		sort($this->parsers);
-	}
-
-	public function run($selector, $interations = 1000)
-	{
-		echo "{\n  selector: '$selector',\n  parsers: {\n";
-
-		foreach ($this->parsers as $parser) {
-			$before = 'before_'.$parser;
-			
-			if (method_exists($this, $before))
-				$this->$before();
-		}
-
-		foreach ($this->parsers as $parser) {
-			echo "    ".str_pad(substr($parser, 3).':', 20)." {";
-
-			$start = microtime(true);
-
-			for ($i = 0; $i < $interations; $i++) {
-				$this->$parser($selector);
-			}
-
-			$time = round(microtime(true) - $start, 4);
-
-			echo "time: $time},\n";
-
-			if (empty(self::$total[$parser]))
-				self::$total[$parser] = 0;
-
-			self::$total[$parser] += $time;
-		}
-
-		echo "  }\n},\n";
-	}
-
 	public function runCDom($selector)
 	{
 		new CDomSelectorPublic($selector);
 	}
 
-	public function before_runPhpSelector()
+	public function before_runPhpSelector($selector)
 	{
 		new SelectorDOM(null); // force autoload
+
+		return $selector;
 	}
 
 	public function runPhpSelector($selector)
@@ -130,12 +85,12 @@ class ParseTest
 
 	public function before_runSymfony()
 	{
-		$this->converter = new \Symfony\Component\CssSelector\CssSelectorConverter;
+		return new \Symfony\Component\CssSelector\CssSelectorConverter;
 	}
 
-	public function runSymfony($selector)
+	public function runSymfony($converter, $selector)
 	{
-		$this->converter->toXPath($selector);
+		$converter->toXPath($selector);
 	}
 
 	public function runZend($selector)
@@ -158,16 +113,3 @@ class ParseTest
 		\PhpCss::toXpath($selector);
 	}
 }
-
-$selectors = [
-	'div.item > h4 > a',
-	'input[type=text]',
-	'div#id1.class1.class2.class3',
-];
-
-foreach ($selectors as $selector) {
-	$test = new ParseTest;
-	$test->run($selector, 10000);
-}
-
-print_r(ParseTest::top());

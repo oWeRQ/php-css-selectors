@@ -3,25 +3,35 @@
 abstract class FindAbstract
 {
 	public $parsers;
-	public $html;
+	public $data;
 
+	public static $jsonOptions = 448; // JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT;
 	public static $total = [];
 
 	public static function top()
 	{
+		$top = [];
 		asort(self::$total);
-		return self::$total;
+		foreach (self::$total as $parser => $time) {
+			$top[substr($parser, 3)] = round($time, 3);
+		}
+		return json_encode($top, self::$jsonOptions);
 	}
 
-	public function __construct($filename)
+	public static function resetTop()
+	{
+		self::$total = [];
+	}
+
+	public function __construct($data = null)
 	{
 		$this->parsers = preg_grep('/^run[A-Z]/', get_class_methods($this));
-		$this->html = file_get_contents($filename);
+		$this->data = $data;
 
 		sort($this->parsers);
 	}
 
-	public function run($selector, $expression, $interations = 1, $desc = null)
+	public function run($selector, $expression = null, $interations = 1, $desc = null)
 	{
 		echo "{\n";
 
@@ -38,24 +48,24 @@ abstract class FindAbstract
 
 			$beforeMethod = 'before_'.$parser;
 			
-			$beforeData = (method_exists($this, $beforeMethod) ? $this->$beforeMethod($this->html) : $this->html);
+			$beforeData = (method_exists($this, $beforeMethod) ? $this->$beforeMethod($this->data) : $this->data);
 
 			$start = microtime(true);
 
 			try {
 				for ($i = 0; $i < $interations; $i++) {
-					$count = $this->$parser($beforeData, $selector, $expression);
+					$result = $this->$parser($beforeData, $selector, $expression);
 				}
 			} catch (\Exception $e) {
-				$count = 0;
+				$result = 0;
 				echo "error: '".$e->getMessage()."', ";
 			}
 
 			$end = microtime(true);
 
-			echo "count: $count, ";
 			echo "time: ".$this->timeFormat($end - $start).", ";
-			echo "before: ".$this->timeFormat($start - $before);
+			echo "before: ".$this->timeFormat($start - $before).", ";
+			echo "result: ".json_encode($result);
 			echo "},\n";
 
 			if (empty(self::$total[$parser]))
@@ -69,6 +79,6 @@ abstract class FindAbstract
 
 	function timeFormat($seconds)
 	{
-		return str_replace('0', 'o', number_format($seconds, 3));
+		return number_format($seconds, 3);
 	}
 }
