@@ -1,12 +1,6 @@
 <?php
 
 require_once '../vendor/autoload.php';
-require_once '../vendor/cdom/CDom.php';
-require_once '../vendor/php-selector/selector.inc';
-require_once '../vendor/phpquery/phpQuery/phpQuery.php';
-require_once '../vendor/phpquery/phpQuery/phpQuery/phpQueryObject.php';
-require_once '../vendor/simplehtmldom/simple_html_dom.php';
-require_once '../vendor/parse/XPathHelper.php';
 
 class CDomSelectorPublic extends CDomSelector
 {
@@ -31,20 +25,6 @@ class simple_html_dom_node_public extends simple_html_dom_node
 
 class ParseTest
 {
-	protected $parsers = [
-		'runCDom',
-		'runPhpSelector',
-		'runPhpQuery',
-		'runPQuery',
-		'runQueryPath',
-		'runSimpleHtmlDom',
-		'runSymfony',
-		'runZend',
-		'runXPathHelper',
-		'runXPathHelperPlain',
-		'runPhpCss',
-	];
-
 	public static $total = [];
 
 	public static function top()
@@ -53,11 +33,15 @@ class ParseTest
 		return self::$total;
 	}
 
+	public function __construct()
+	{
+		$this->parsers = preg_grep('/^run[A-Z]/', get_class_methods($this));
+		
+		sort($this->parsers);
+	}
+
 	public function run($selector, $interations = 1000)
 	{
-		//shuffle($this->parsers);
-		sort($this->parsers);
-
 		echo "{\n  selector: '$selector',\n  parsers: {\n";
 
 		foreach ($this->parsers as $parser) {
@@ -65,12 +49,10 @@ class ParseTest
 			
 			if (method_exists($this, $before))
 				$this->$before();
-
-			$this->$parser('div');
 		}
 
 		foreach ($this->parsers as $parser) {
-			echo "    ".str_pad(substr($parser, 3).':', 18)." {";
+			echo "    ".str_pad(substr($parser, 3).':', 20)." {";
 
 			$start = microtime(true);
 
@@ -94,6 +76,11 @@ class ParseTest
 	public function runCDom($selector)
 	{
 		new CDomSelectorPublic($selector);
+	}
+
+	public function before_runPhpSelector()
+	{
+		new SelectorDOM(null); // force autoload
 	}
 
 	public function runPhpSelector($selector)
@@ -156,14 +143,14 @@ class ParseTest
 		\Zend\Dom\Document\Query::cssToXpath($selector);
 	}
 
-	public function runXPathHelper($selector)
+	public function runSelectorHelper($selector)
 	{
-		\XPathHelper::toXPath($selector);
+		\Parse\SelectorHelper::toXPath($selector);
 	}
 
-	public function runXPathHelperPlain($selector)
+	public function runSelectorHelperPlain($selector)
 	{
-		\XPathHelper::toXPathPlain($selector);
+		\Parse\SelectorHelper::toXPathPlain($selector);
 	}
 
 	public function runPhpCss($selector)

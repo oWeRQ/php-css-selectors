@@ -1,9 +1,6 @@
 <?php
 
-// https://github.com/TobiaszCudnik/phpquery
-
-require_once('vendor/phpquery/phpQuery/phpQuery.php');
-require_once('vendor/phpquery/phpQuery/phpQuery/phpQueryObject.php');
+require_once 'vendor/autoload.php';
 
 //phpQuery::$debug = true;
 

@@ -1,14 +1,6 @@
 <?php
 
 require_once '../vendor/autoload.php';
-require_once '../vendor/powertools/dom-query/vendor/Loader.php';
-require_once '../vendor/cdom/CDom.php';
-require_once '../vendor/phpquery/phpQuery/phpQuery.php';
-require_once '../vendor/simplehtmldom/simple_html_dom.php';
-require_once '../vendor/parse/DOMHelper.php';
-require_once '../vendor/parse/XPathHelper.php';
-require_once '../vendor/parse/XPathQuery.php';
-require_once '../vendor/parse/ParseQuery.php';
 
 function time_format($seconds)
 {
@@ -33,11 +25,13 @@ class FindTest
 	{
 		$this->parsers = preg_grep('/^run[A-Z]/', get_class_methods($this));
 		$this->html = file_get_contents($filename);
+
+		sort($this->parsers);
 	}
 
 	public function toXPath($selector)
 	{
-		return \XPathHelper::toXPath($selector);
+		return \Parse\SelectorHelper::toXPath($selector);
 
 		return \PhpCss::toXpath($selector);
 
@@ -104,7 +98,7 @@ class FindTest
 
 	public function before_runXPath($selector)
 	{
-		$this->xpath = \DOMHelper::htmlXPath($this->html, false);
+		$this->xpath = \Parse\DOMHelper::htmlXPath($this->html, false);
 	}
 
 	public function runXPath($selector)
@@ -114,7 +108,7 @@ class FindTest
 
 	public function before_runXPathExt($selector)
 	{
-		$this->xpathExt = \DOMHelper::htmlXPath($this->html);
+		$this->xpathExt = \Parse\DOMHelper::htmlXPath($this->html);
 	}
 
 	public function runXPathExt($selector)
@@ -124,18 +118,18 @@ class FindTest
 
 	public function before_runXPathQuery()
 	{
-		$xpath = \DOMHelper::htmlXPath($this->html);
-		$this->xpathQuery = new \XPathQuery($xpath->document, $xpath);
+		$xpath = \Parse\DOMHelper::htmlXPath($this->html);
+		$this->xpathQuery = new \Parse\XPathQuery($xpath->document, $xpath);
 	}
 
 	public function runXPathQuery($selector)
 	{
-		return $this->xpathQuery->xpath($this->expression)->length();
+		return $this->xpathQuery->xpath($this->expression)->count();
 	}
 
 	public function before_runParseQuery()
 	{
-		$this->parseQuery = \ParseQuery::loadHtml($this->html);
+		$this->parseQuery = \Parse\ParseQuery::loadHtml($this->html);
 	}
 
 	public function runParseQuery($selector)
@@ -185,7 +179,7 @@ class FindTest
 
 	public function before_runFluentDOM($selector)
 	{
-		$this->FluentDOM = FluentDOM::Query($this->html);
+		$this->FluentDOM = \FluentDOM::Query($this->html);
 	}
 	public function runFluentDOM($selector)
 	{
@@ -194,7 +188,7 @@ class FindTest
 
 	public function before_runFluentDOMCSS1($selector)
 	{
-		$this->FluentDOMCSS1 = FluentDOM::QueryCss($this->html, 'text/xml');
+		$this->FluentDOMCSS1 = \FluentDOM::QueryCss($this->html, 'text/xml');
 	}
 
 	public function runFluentDOMCSS1($selector)
@@ -204,7 +198,7 @@ class FindTest
 
 	public function before_runFluentDOMCSS2($selector)
 	{
-		$this->FluentDOMCSS2 = FluentDOM::QueryCss($this->html, 'text/html');
+		$this->FluentDOMCSS2 = \FluentDOM::QueryCss($this->html, 'text/html');
 	}
 
 	public function runFluentDOMCSS2($selector)
@@ -217,7 +211,7 @@ class FindTest
 		$this->phpQuery = \phpQuery::newDocument($this->html);
 	}
 
-	public function _runPhpQuery($selector)
+	public function runPhpQuery($selector)
 	{
 		return $this->phpQuery[$selector]->size();
 	}
@@ -227,17 +221,18 @@ class FindTest
 		$this->queryPath = qp($this->html);
 	}
 
-	public function _runQueryPath($selector)
+	public function runQueryPath($selector)
 	{
 		return $this->queryPath->find($selector)->length;
 	}
 
 	public function before_runSimpleHtmlDom($selector)
 	{
+		new \simple_html_dom; // force autoload
 		$this->simpleHtmlDom = str_get_html($this->html);
 	}
 
-	public function _runSimpleHtmlDom($selector)
+	public function runSimpleHtmlDom($selector)
 	{
 		return count($this->simpleHtmlDom->find($selector));
 	}
@@ -247,7 +242,7 @@ class FindTest
 		$this->cDom = \CDom::fromString($this->html);
 	}
 
-	public function _runCDom($selector)
+	public function runCDom($selector)
 	{
 		return $this->cDom->find($selector)->length;
 	}
@@ -257,7 +252,7 @@ class FindTest
 		$this->pQuery = \pQuery::parseStr($this->html);
 	}
 
-	public function _runPQuery($selector)
+	public function runPQuery($selector)
 	{
 		return $this->pQuery->query($selector)->count();
 	}

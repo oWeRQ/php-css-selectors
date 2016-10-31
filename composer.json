@@ -7,8 +7,82 @@
         "masterminds/html5": "^2.2",
         "symfony/dom-crawler": "^3.1",
         "fluentdom/fluentdom": "^5.3",
-        "wa72/htmlpagedom": "^1.2",
         "gymadarasz/xparser": "^0.3.2",
-        "fluentdom/selectors-phpcss": "^1.0"
-    }
+        "fluentdom/selectors-phpcss": "^1.0",
+        "parse/parse": "dev-master",
+        "simplehtmldom/simplehtmldom": "*",
+        "tobiaszcudnik/phpquery": "*",
+        "amal/cdom": "dev-master",
+        "tj/php-selector": "*"
+    },
+    "repositories": [
+        {
+            "type": "git",
+            "url": "git@bitbucket.org:nowmedia-ru/parse.git"
+        },
+        {
+            "type": "package",
+            "package": {
+                "name": "simplehtmldom/simplehtmldom",
+                "version": "1.5",
+                "dist": {
+                    "url": "http://freefr.dl.sourceforge.net/project/simplehtmldom/simplehtmldom/1.5/simplehtmldom_1_5.zip",
+                    "type": "zip"
+                },
+                "source": {
+                    "url": "https://svn.code.sf.net/p/simplehtmldom/code",
+                    "type": "svn",
+                    "reference": "trunk/"
+                },
+                "autoload": {
+                    "classmap": ["simple_html_dom.php"]
+                }
+            }
+        },
+        {
+            "type": "package",
+            "package": {
+                "name": "tobiaszcudnik/phpquery",
+                "version": "0.9.5",
+                "source": {
+                    "url": "https://github.com/TobiaszCudnik/phpquery.git",
+                    "type": "git",
+                    "reference": "master"
+                },
+                "autoload": {
+                    "classmap": ["phpQuery/"]
+                }
+            }
+        },
+        {
+            "type": "package",
+            "package": {
+                "name": "amal/cdom",
+                "version": "dev-master",
+                "source": {
+                    "url": "https://github.com/amal/CDom.git",
+                    "type": "git",
+                    "reference": "master"
+                },
+                "autoload": {
+                    "classmap": ["CDom.php", "CLexer.php"]
+                }
+            }
+        },
+        {
+            "type": "package",
+            "package": {
+                "name": "tj/php-selector",
+                "version": "1.1.5",
+                "source": {
+                    "url": "https://github.com/tj/php-selector.git",
+                    "type": "git",
+                    "reference": "1.1.5"
+                },
+                "autoload": {
+                    "classmap": ["selector.inc"]
+                }
+            }
+        }
+    ]
 }

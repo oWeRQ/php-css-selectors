@@ -1,7 +1,7 @@
 <?php
 
-// https://github.com/tj/php-selector
+require_once 'vendor/autoload.php';
 
-require_once 'vendor/php-selector/selector.inc';
+new SelectorDOM(null); // force autoload
 
 var_dump(selector_to_xpath('div.item > h4 > a'));

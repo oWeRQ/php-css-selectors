@@ -4,9 +4,26 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "cf0ff8fb3eee9f6842e15adecbe50295",
-    "content-hash": "d6630cbb0b8b6edb89f4deb4f7796e71",
+    "hash": "9978a8e2221435556038441cb790b889",
+    "content-hash": "313825605a3d4d8918155bd5ee63abaa",
     "packages": [
+        {
+            "name": "amal/cdom",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/amal/CDom.git",
+                "reference": "master"
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "CDom.php",
+                    "CLexer.php"
+                ]
+            },
+            "time": "2011-11-01 15:29:46"
+        },
         {
             "name": "carica/phpcss",
             "version": "0.3.0",
@@ -242,6 +259,31 @@
             "time": "2016-09-22 11:01:11"
         },
         {
+            "name": "parse/parse",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "git@bitbucket.org:nowmedia-ru/parse.git",
+                "reference": "bbcbd70d9c05c1926418cd2ad48125d6545d6a48"
+            },
+            "require-dev": {
+                "apigen/apigen": "^4.1",
+                "phpunit/phpunit": "^5.6"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Parse\\": "src/",
+                    "Parse\\Tests\\": "tests/"
+                }
+            },
+            "license": [
+                "MIT"
+            ],
+            "description": "jQuery-like PHP DOM",
+            "time": "2016-10-28 08:47:06"
+        },
+        {
             "name": "querypath/querypath",
             "version": "3.0.5",
             "source": {
@@ -284,17 +326,38 @@
             "time": "2016-08-01 22:40:30"
         },
         {
-            "name": "symfony/css-selector",
-            "version": "v3.1.4",
+            "name": "simplehtmldom/simplehtmldom",
+            "version": "1.5",
             "source": {
-                "type": "git",
-                "url": "https://github.com/symfony/css-selector.git",
-                "reference": "2851e1932d77ce727776154d659b232d061e816a"
+                "type": "svn",
+                "url": "https://svn.code.sf.net/p/simplehtmldom/code",
+                "reference": "trunk/"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/css-selector/zipball/2851e1932d77ce727776154d659b232d061e816a",
-                "reference": "2851e1932d77ce727776154d659b232d061e816a",
+                "url": "http://downloads.sourceforge.net/project/simplehtmldom/simplehtmldom/1.5/simplehtmldom_1_5.zip?r=https%3A%2F%2Fsourceforge.net%2Fprojects%2Fsimplehtmldom%2Ffiles%2Fsimplehtmldom%2F1.5%2F&ts=1477903371&use_mirror=kent",
+                "reference": null,
+                "shasum": null
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "simple_html_dom.php"
+                ]
+            }
+        },
+        {
+            "name": "symfony/css-selector",
+            "version": "v3.1.6",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/css-selector.git",
+                "reference": "ca809c64072e0fe61c1c7fb3c76cdc32265042ac"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/css-selector/zipball/ca809c64072e0fe61c1c7fb3c76cdc32265042ac",
+                "reference": "ca809c64072e0fe61c1c7fb3c76cdc32265042ac",
                 "shasum": ""
             },
             "require": {
@@ -334,20 +397,20 @@
             ],
             "description": "Symfony CssSelector Component",
             "homepage": "https://symfony.com",
-            "time": "2016-06-29 05:41:56"
+            "time": "2016-09-06 11:02:40"
         },
         {
             "name": "symfony/dom-crawler",
-            "version": "v3.1.4",
+            "version": "v3.1.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/symfony/dom-crawler.git",
-                "reference": "bb7395e8b1db3654de82b9f35d019958276de4d7"
+                "reference": "59eee3c76eb89f21857798620ebdad7a05ad14f4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/symfony/dom-crawler/zipball/bb7395e8b1db3654de82b9f35d019958276de4d7",
-                "reference": "bb7395e8b1db3654de82b9f35d019958276de4d7",
+                "url": "https://api.github.com/repos/symfony/dom-crawler/zipball/59eee3c76eb89f21857798620ebdad7a05ad14f4",
+                "reference": "59eee3c76eb89f21857798620ebdad7a05ad14f4",
                 "shasum": ""
             },
             "require": {
@@ -390,7 +453,7 @@
             ],
             "description": "Symfony DomCrawler Component",
             "homepage": "https://symfony.com",
-            "time": "2016-08-05 08:37:39"
+            "time": "2016-10-18 15:46:07"
         },
         {
             "name": "symfony/polyfill-mbstring",
@@ -504,60 +567,34 @@
             "time": "2016-01-14 20:55:00"
         },
         {
-            "name": "wa72/htmlpagedom",
-            "version": "v1.2.3",
+            "name": "tj/php-selector",
+            "version": "1.1.5",
             "source": {
                 "type": "git",
-                "url": "https://github.com/wasinger/htmlpagedom.git",
-                "reference": "ec73f018ab8de53eb3abdd82d54b11158af3af27"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/wasinger/htmlpagedom/zipball/ec73f018ab8de53eb3abdd82d54b11158af3af27",
-                "reference": "ec73f018ab8de53eb3abdd82d54b11158af3af27",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.4.0",
-                "symfony/css-selector": ">=2.3",
-                "symfony/dom-crawler": "^2.3 <2.8 | ^2.8.3 | ^3.0.1"
-            },
-            "require-dev": {
-                "wa72/html-pretty-min": "^0.1.2"
-            },
-            "suggest": {
-                "wa72/html-pretty-min": "Minify or indent HTML documents"
+                "url": "https://github.com/tj/php-selector.git",
+                "reference": "1.1.5"
             },
             "type": "library",
-            "extra": {
-                "branch-alias": {
-                    "dev-master": "1.2.x-dev"
-                }
-            },
             "autoload": {
-                "psr-4": {
-                    "Wa72\\HtmlPageDom\\": "src/"
-                }
+                "classmap": [
+                    "selector.inc"
+                ]
+            }
+        },
+        {
+            "name": "tobiaszcudnik/phpquery",
+            "version": "0.9.5",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/TobiaszCudnik/phpquery.git",
+                "reference": "master"
             },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Christoph Singer",
-                    "email": "singer@webagentur72.de",
-                    "homepage": "http://www.webagentur72.de"
-                }
-            ],
-            "description": "PHP implementation of the jQuery DOM manipulation API for HTML documents",
-            "homepage": "http://github.com/wasinger/htmlpagedom",
-            "keywords": [
-                "crawler",
-                "dom",
-                "html"
-            ],
-            "time": "2016-03-22 14:52:23"
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "phpQuery/"
+                ]
+            }
         },
         {
             "name": "zendframework/zend-dom",
@@ -608,7 +645,10 @@
     "packages-dev": [],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {
+        "parse/parse": 20,
+        "amal/cdom": 20
+    },
     "prefer-stable": false,
     "prefer-lowest": false,
     "platform": [],

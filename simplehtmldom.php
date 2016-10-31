@@ -1,8 +1,6 @@
 <?php
 
-// https://sourceforge.net/projects/simplehtmldom/files/
-
-require_once 'vendor/simplehtmldom/simple_html_dom.php';
+require_once 'vendor/autoload.php';
 
 class simple_html_dom_node_public extends simple_html_dom_node
 {
