@@ -193,7 +193,6 @@ class FindCount extends FindAbstract
 	 */
 	public function before_runSimpleHtmlDom($html)
 	{
-		new \simple_html_dom; // force autoload
 		return str_get_html($html);
 	}
 

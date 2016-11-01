@@ -3,6 +3,8 @@
 require_once '../vendor/autoload.php';
 require_once 'FindText.php';
 
+$test = new FindText(file_get_contents('fixtures/test2.html'));
+
 $interations = 10;
 
 $selectors = [
@@ -28,14 +30,20 @@ $translators = [
 		$converter = new \Symfony\Component\CssSelector\CssSelectorConverter;
 		return $converter->toXPath($selector);
 	},
+	'ZendDom' => function($selector){
+		return \Zend\Dom\Document\Query::cssToXpath($selector);
+	}
 ];
 
 foreach ($translators as $desc => $translator) {
 	foreach ($selectors as $selector) {
-		$test = new FindText(file_get_contents('fixtures/test2.html'));
-		$test->run($selector, $translator($selector), $interations, $desc);
+		try {
+			$test->run($selector, $translator($selector), $interations, $desc);
+		} catch (Exception $e) {
+			
+		}
 	}
 
-	echo FindText::top().",\n";
-	FindText::resetTop();
+	echo $test->getTop().",\n";
+	$test->resetTop();
 }

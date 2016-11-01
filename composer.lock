@@ -4,8 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "9978a8e2221435556038441cb790b889",
-    "content-hash": "313825605a3d4d8918155bd5ee63abaa",
+    "hash": "8a36cff46e36f0403be943be11a6e00c",
+    "content-hash": "37486950abc845c8e4b8850d33724639",
     "packages": [
         {
             "name": "amal/cdom",
@@ -341,7 +341,7 @@
             },
             "type": "library",
             "autoload": {
-                "classmap": [
+                "files": [
                     "simple_html_dom.php"
                 ]
             }
@@ -576,7 +576,7 @@
             },
             "type": "library",
             "autoload": {
-                "classmap": [
+                "files": [
                     "selector.inc"
                 ]
             }

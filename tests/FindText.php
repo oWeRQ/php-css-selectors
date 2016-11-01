@@ -5,6 +5,14 @@ require_once 'FindAbstract.php';
 
 class FindText extends FindAbstract
 {
+	public function processResult($result)
+	{
+		return [
+			'count' => count($result),
+			'len' => strlen(preg_replace('/\s+/m', '', implode($result))),
+		];
+	}
+
 	/**
 	 * XPath
 	 */
@@ -19,7 +27,7 @@ class FindText extends FindAbstract
 		foreach ($xpath->query($expression) as $node) {
 			$result[] = trim($node->textContent);
 		}
-		return count($result);
+		return $this->processResult($result);
 	}
 
 	/**
@@ -36,7 +44,7 @@ class FindText extends FindAbstract
 		foreach ($xpath->query($expression) as $node) {
 			$result[] = trim($node->textContent);
 		}
-		return count($result);
+		return $this->processResult($result);
 	}
 
 	/**
@@ -53,7 +61,7 @@ class FindText extends FindAbstract
 		foreach ($xpath->query($expression, $xpath->document) as $node) {
 			$result[] = trim($node->textContent);
 		}
-		return count($result);
+		return $this->processResult($result);
 	}
 
 	/**
@@ -71,7 +79,7 @@ class FindText extends FindAbstract
 		foreach ($xpathQuery->xpath($expression) as $node) {
 			$result[] = trim($node->textContent);
 		}
-		return count($result);
+		return $this->processResult($result);
 	}
 
 	/**
@@ -88,7 +96,7 @@ class FindText extends FindAbstract
 		foreach ($parseQuery->find($selector) as $node) {
 			$result[] = trim($node->text());
 		}
-		return count($result);
+		return $this->processResult($result);
 	}
 
 	/**
@@ -103,9 +111,9 @@ class FindText extends FindAbstract
 	{
 		$result = [];
 		foreach ($simpleXML->xpath($expression) as $node) {
-			$result[] = trim($node->textContent);
+			$result[] = trim((string)$node);
 		}
-		return count($result);
+		return $this->processResult($result);
 	}
 
 	/**
@@ -122,7 +130,7 @@ class FindText extends FindAbstract
 		foreach ($zendDom->execute($selector) as $node) {
 			$result[] = trim($node->textContent);
 		}
-		return count($result);
+		return $this->processResult($result);
 	}
 
 	/**
@@ -139,7 +147,7 @@ class FindText extends FindAbstract
 		foreach ($zendDom->queryXpath($expression, $selector) as $node) {
 			$result[] = trim($node->textContent);
 		}
-		return count($result);
+		return $this->processResult($result);
 	}
 
 	/**
@@ -156,7 +164,7 @@ class FindText extends FindAbstract
 		$domCrawler->filter($selector)->each(function($node) use(&$result){
 			$result[] = trim($node->text());
 		});
-		return count($result);
+		return $this->processResult($result);
 	}
 
 	/**
@@ -173,7 +181,7 @@ class FindText extends FindAbstract
 		$domCrawler->filterXPath($expression)->each(function($node) use(&$result){
 			$result[] = trim($node->text());
 		});
-		return count($result);
+		return $this->processResult($result);
 	}
 
 	/**
@@ -190,7 +198,7 @@ class FindText extends FindAbstract
 		foreach ($fluentDOM->find($expression) as $node) {
 			$result[] = trim($node->textContent);
 		}
-		return count($result);
+		return $this->processResult($result);
 	}
 
 	/**
@@ -207,7 +215,7 @@ class FindText extends FindAbstract
 		foreach ($fluentDOM->find($selector) as $node) {
 			$result[] = trim($node->textContent);
 		}
-		return count($result);
+		return $this->processResult($result);
 	}
 
 	/**
@@ -224,7 +232,7 @@ class FindText extends FindAbstract
 		foreach ($fluentDOM->find($selector) as $node) {
 			$result[] = trim($node->textContent);
 		}
-		return count($result);
+		return $this->processResult($result);
 	}
 
 	/**
@@ -241,7 +249,7 @@ class FindText extends FindAbstract
 		foreach ($cDom->find($selector) as $node) {
 			$result[] = trim($node->text());
 		}
-		return count($result);
+		return $this->processResult($result);
 	}
 
 	/**
@@ -249,7 +257,6 @@ class FindText extends FindAbstract
 	 */
 	public function before_runSimpleHtmlDom($html)
 	{
-		new \simple_html_dom; // force autoload
 		return str_get_html($html);
 	}
 
@@ -259,7 +266,7 @@ class FindText extends FindAbstract
 		foreach ($simpleHtmlDom->find($selector) as $node) {
 			$result[] = trim($node->text());
 		}
-		return count($result);
+		return $this->processResult($result);
 	}
 
 	/**
@@ -276,7 +283,7 @@ class FindText extends FindAbstract
 		foreach ($phpQuery[$selector] as $node) {
 			$result[] = trim(pq($node)->text());
 		}
-		return count($result);
+		return $this->processResult($result);
 	}
 
 	/**
@@ -293,7 +300,7 @@ class FindText extends FindAbstract
 		foreach ($queryPath->find($selector) as $node) {
 			$result[] = trim($node->text());
 		}
-		return count($result);
+		return $this->processResult($result);
 	}
 
 	/**
@@ -310,7 +317,7 @@ class FindText extends FindAbstract
 		foreach ($queryPath->find($selector) as $node) {
 			$result[] = trim($node->text());
 		}
-		return count($result);
+		return $this->processResult($result);
 	}
 
 	/**
@@ -327,7 +334,7 @@ class FindText extends FindAbstract
 		foreach ($queryPath->find($selector) as $node) {
 			$result[] = trim($node->text());
 		}
-		return count($result);
+		return $this->processResult($result);
 	}
 
 	/**
@@ -344,7 +351,7 @@ class FindText extends FindAbstract
 		foreach ($pQuery->query($selector) as $node) {
 			$result[] = trim($node->text());
 		}
-		return count($result);
+		return $this->processResult($result);
 	}
 
 	/**
@@ -364,6 +371,6 @@ class FindText extends FindAbstract
 		foreach ($xParser->find($selector) as $node) {
 			$result[] = trim($node->text());
 		}
-		return count($result);
+		return $this->processResult($result);
 	}
 }

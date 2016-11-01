@@ -2,36 +2,35 @@
 
 abstract class FindAbstract
 {
-	public $parsers;
-	public $data;
-
-	public static $jsonOptions = 448; // JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT;
-	public static $total = [];
-
-	public static function top()
-	{
-		$top = [];
-		asort(self::$total);
-		foreach (self::$total as $parser => $time) {
-			$top[substr($parser, 3)] = round($time, 3);
-		}
-		return json_encode($top, self::$jsonOptions);
-	}
-
-	public static function resetTop()
-	{
-		self::$total = [];
-	}
+	public $parsers = [];
+	public $parsersData = [];
+	public $parsersTime = [];
 
 	public function __construct($data = null)
 	{
 		$this->parsers = preg_grep('/^run[A-Z]/', get_class_methods($this));
-		$this->data = $data;
+
+		echo "{\n";
+
+		foreach ($this->parsers as $parser) {
+			$beforeMethod = 'before_'.$parser;
+
+			$startTime = microtime(true);
+			
+			$this->parsersData[$parser] = (method_exists($this, $beforeMethod) ? $this->$beforeMethod($data) : $data);
+
+			$beforeTime = microtime(true) - $startTime;
+
+			echo "    ".str_pad(substr($parser, 3).':', 18)." {";
+			echo "before: ".$this->timeFormat($beforeTime)."},\n";
+		}
+
+		echo "},\n";
 
 		sort($this->parsers);
 	}
 
-	public function run($selector, $expression = null, $interations = 1, $desc = null)
+	public function run($selector, $expression, $interations = 1, $desc = null)
 	{
 		echo "{\n";
 
@@ -44,34 +43,29 @@ abstract class FindAbstract
 		foreach ($this->parsers as $parser) {
 			echo "    ".str_pad(substr($parser, 3).':', 18)." {";
 
-			$before = microtime(true);
+			$beforeData = $this->parsersData[$parser];
 
-			$beforeMethod = 'before_'.$parser;
-			
-			$beforeData = (method_exists($this, $beforeMethod) ? $this->$beforeMethod($this->data) : $this->data);
-
-			$start = microtime(true);
+			$startTime = microtime(true);
 
 			try {
 				for ($i = 0; $i < $interations; $i++) {
 					$result = $this->$parser($beforeData, $selector, $expression);
 				}
 			} catch (\Exception $e) {
-				$result = 0;
+				$result = null;
 				echo "error: '".$e->getMessage()."', ";
 			}
 
-			$end = microtime(true);
+			$runTime = microtime(true) - $startTime;
 
-			echo "time: ".$this->timeFormat($end - $start).", ";
-			echo "before: ".$this->timeFormat($start - $before).", ";
+			echo "run: ".$this->timeFormat($runTime).", ";
 			echo "result: ".json_encode($result);
 			echo "},\n";
 
-			if (empty(self::$total[$parser]))
-				self::$total[$parser] = 0;
+			if (empty($this->parsersTime[$parser]))
+				$this->parsersTime[$parser] = 0;
 
-			self::$total[$parser] += $end - $before;
+			$this->parsersTime[$parser] += $runTime;
 		}
 
 		echo "  }\n},\n";
@@ -80,5 +74,20 @@ abstract class FindAbstract
 	function timeFormat($seconds)
 	{
 		return number_format($seconds, 3);
+	}
+
+	public function getTop()
+	{
+		$top = [];
+		asort($this->parsersTime);
+		foreach ($this->parsersTime as $parser => $time) {
+			$top[substr($parser, 3)] = round($time, 3);
+		}
+		return json_encode($top, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT);
+	}
+
+	public function resetTop()
+	{
+		$this->parsersTime = [];
 	}
 }

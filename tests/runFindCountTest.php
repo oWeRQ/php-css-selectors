@@ -3,6 +3,8 @@
 require_once '../vendor/autoload.php';
 require_once 'FindCount.php';
 
+$test = new FindCount(file_get_contents('fixtures/test1.html'));
+
 $interations = 1;
 
 $selectors = [
@@ -36,14 +38,20 @@ $translators = [
 		$converter = new \Symfony\Component\CssSelector\CssSelectorConverter;
 		return $converter->toXPath($selector);
 	},
+	'ZendDom' => function($selector){
+		return \Zend\Dom\Document\Query::cssToXpath($selector);
+	}
 ];
 
 foreach ($translators as $desc => $translator) {
 	foreach ($selectors as $selector) {
-		$test = new FindCount(file_get_contents('fixtures/test1.html'));
-		$test->run($selector, $translator($selector), $interations, $desc);
+		try {
+			$test->run($selector, $translator($selector), $interations, $desc);
+		} catch (Exception $e) {
+			
+		}
 	}
 
-	echo FindCount::top().",\n";
-	FindCount::resetTop();
+	echo $test->getTop().",\n";
+	$test->resetTop();
 }

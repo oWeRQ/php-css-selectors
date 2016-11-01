@@ -26,30 +26,23 @@ class simple_html_dom_node_public extends simple_html_dom_node
 
 class ParseSelector extends FindAbstract
 {
-	public function runCDom($selector)
+	public function runCDom($data, $selector)
 	{
 		new CDomSelectorPublic($selector);
 	}
 
-	public function before_runPhpSelector($selector)
+	public function runPhpSelector($data, $selector)
 	{
-		new SelectorDOM(null); // force autoload
-
-		return $selector;
+		return selector_to_xpath($selector);
 	}
 
-	public function runPhpSelector($selector)
-	{
-		selector_to_xpath($selector);
-	}
-
-	public function runPhpQuery($selector)
+	public function runPhpQuery($data, $selector)
 	{
 		$phpQuery = new \phpQueryObjectPublic;
 		$phpQuery->parseSelector($selector);
 	}
 
-	public function runPQuery($selector)
+	public function runPQuery($data, $selector)
 	{
 		$parser = new \pQuery\CSSQueryTokenizer;
 		$parser->setDoc($selector);
@@ -70,14 +63,14 @@ class ParseSelector extends FindAbstract
 		} while ($token = $parser->next());
 	}
 
-	public function runQueryPath($selector)
+	public function runQueryPath($data, $selector)
 	{
 		$handler = new \QueryPath\CSS\Selector;
 		$parser = new \QueryPath\CSS\Parser($selector, $handler);
 		$parser->parse();
 	}
 
-	public function runSimpleHtmlDom($selector)
+	public function runSimpleHtmlDom($data, $selector)
 	{
 		$node = new \simple_html_dom_node_public(new \simple_html_dom);
 		$node->parse_selector($selector);
@@ -90,26 +83,26 @@ class ParseSelector extends FindAbstract
 
 	public function runSymfony($converter, $selector)
 	{
-		$converter->toXPath($selector);
+		return $converter->toXPath($selector);
 	}
 
-	public function runZend($selector)
+	public function runZend($data, $selector)
 	{
-		\Zend\Dom\Document\Query::cssToXpath($selector);
+		return \Zend\Dom\Document\Query::cssToXpath($selector);
 	}
 
-	public function runSelectorHelper($selector)
+	public function runSelectorHelper($data, $selector)
 	{
-		\Parse\SelectorHelper::toXPath($selector);
+		return \Parse\SelectorHelper::toXPath($selector);
 	}
 
-	public function runSelectorHelperPlain($selector)
+	public function runSelectorHelperPlain($data, $selector)
 	{
-		\Parse\SelectorHelper::toXPathPlain($selector);
+		return \Parse\SelectorHelper::toXPathPlain($selector);
 	}
 
-	public function runPhpCss($selector)
+	public function runPhpCss($data, $selector)
 	{
-		\PhpCss::toXpath($selector);
+		return \PhpCss::toXpath($selector);
 	}
 }

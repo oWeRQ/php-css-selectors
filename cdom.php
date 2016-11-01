@@ -2,9 +2,9 @@
 
 $selector = 'div.item > h4 > a';
 
-// https://github.com/amal/CDom
+require_once 'vendor/autoload.php';
 
-require_once 'vendor/cdom/CDom.php';
+CDom::$debug = true;
 
 class CDomSelectorPublic extends CDomSelector
 {

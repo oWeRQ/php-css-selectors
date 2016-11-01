@@ -3,7 +3,7 @@
 require_once '../vendor/autoload.php';
 require_once 'ParseSelector.php';
 
-$jsonOptions = JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT;
+$test = new ParseSelector($selector);
 
 $interations = 10000;
 
@@ -14,9 +14,11 @@ $selectors = [
 ];
 
 foreach ($selectors as $selector) {
-	$test = new ParseSelector($selector);
-	$test->run($selector, null, $interations);
+	try {
+		$test->run($selector, null, $interations);
+	} catch (Exception $e) {
+		
+	}
 }
 
-echo ParseSelector::top().",\n";
-ParseSelector::resetTop();
+echo $test->getTop().",\n";

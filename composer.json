@@ -35,7 +35,7 @@
                     "reference": "trunk/"
                 },
                 "autoload": {
-                    "classmap": ["simple_html_dom.php"]
+                    "files": ["simple_html_dom.php"]
                 }
             }
         },
@@ -80,7 +80,7 @@
                     "reference": "1.1.5"
                 },
                 "autoload": {
-                    "classmap": ["selector.inc"]
+                    "files": ["selector.inc"]
                 }
             }
         }
